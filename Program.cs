@@ -1,4 +1,6 @@
 using ApiMensageria.Data;
+using ApiMensageria.Mapping;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +23,8 @@ builder.Services.AddDbContext<DataContext>(
                 .EnableSensitiveDataLogging()
                 .EnableDetailedErrors()
 );
+
+builder.Services.AddAutoMapper(typeof(UserMapping));
 
 var app = builder.Build();
 
