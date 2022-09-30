@@ -19,12 +19,12 @@ namespace ApiMensageria.Mapping
             .IsRequired();
 
       builder.Property(u => u.Created)
+            .HasMaxLength(100)
             .IsRequired();
 
 
       builder.HasOne(l => l.Login)
-            .WithOne(u => u.User)
-            .IsRequired();
+            .WithOne(u => u.User);
 
       builder.HasMany(m => m.Messages)
             .WithOne(u => u.UserReceiver);
