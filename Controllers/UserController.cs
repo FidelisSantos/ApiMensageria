@@ -41,8 +41,14 @@ namespace ApiMensageria.Controllers
     //Consultar por Id o usuário
     [HttpGet]
     [Route("{UserModelId}")]
-    public IActionResult BuscarID([FromRoute] int UserModelId) =>
-    _context.Users.Any(U => U.UserModelId == UserModelId) != null ? Ok(_context.Users.Find()) : NotFound();
+    public IActionResult BuscarID([FromRoute] int UserModelId){
+    var busca = _context.Users.FirstOrDefault(U => U.UserModelId == UserModelId);
+    return busca != null ? Ok(busca):NotFound();
+    
+    }
+
+
+
 
     //Deletar usuário
     [HttpDelete]
@@ -56,10 +62,11 @@ namespace ApiMensageria.Controllers
 
     //Atualizar informações do usuário
     [HttpPut]
-    [Route("UserModelId")]
-    public IActionResult AtualizaDados([FromRoute] int UserModelId, [FromBody] UserModel User)
+    [Route("{UserModelId}")]
+    public IActionResult AtualizaDados([FromRoute] int UserModelId, [FromBody] UserRequest userRequest)
     {
 
+      var User = _Mapper.Map<UserModel>(userRequest);
       var atualizar = _context.Users.FirstOrDefault(U => U.UserModelId == UserModelId);
       if (atualizar != null)
       {
@@ -71,4 +78,6 @@ namespace ApiMensageria.Controllers
       return NotFound();
     }
   }
+
+
 }
