@@ -4,9 +4,7 @@ namespace ApiMensageria.Interfaces
 {
   public interface ILoginServices
   {
-    LoginModel Find(string Email);
-    LoginModel Create(LoginModel newUser);
-    LoginModel Update(string Email, LoginModel updateUser);
-    bool Delete(string Email);
+    LoginModel Find(string Email, string Password);
+    LoginModel Update(int UserModelId, LoginModel updateUser);
   }
 }
