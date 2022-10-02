@@ -1,21 +1,24 @@
 using AutoMapper;
 using ApiMensageria.Model;
 
-namespace ApiMensageria.Mapping{
+namespace ApiMensageria.Mapping
+{
 
-    public class UserMapping : Profile{
-        public UserMapping()
-        {
-            CreateMap<UserRequest, UserModel>()
-            .ReverseMap();
-            
+  public class UserMapping : Profile
+  {
+    public UserMapping()
+    {
+      CreateMap<UserRequest, UserModel>()
+      .ReverseMap();
 
-            CreateMap<LoginRequest, LoginModel>()
-            .ReverseMap();
+      CreateMap<LoginRequest, LoginModel>()
+      .ReverseMap();
 
+      CreateMap<UserCreatedRequest, UserModel>()
+      .ReverseMap();
 
-            
-
-        }
+      CreateMap<MessageModel, MessageRequest>()
+      .ReverseMap();
     }
+  }
 }

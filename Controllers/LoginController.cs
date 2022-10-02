@@ -2,11 +2,12 @@ using ApiMensageria.Model;
 using Microsoft.AspNetCore.Mvc;
 using ApiMensageria.Data;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApiMensageria.Controllers
 {
   [ApiController]
-  [Route("api/user")]
+  [Route("login")]
   public class LoginController : ControllerBase
   {
 
@@ -21,35 +22,34 @@ namespace ApiMensageria.Controllers
     }
 
 
-    //Consultar BD para listar se tem algum usuário
+    //Após conclusão apagar o método de busca de todos login
     [HttpGet]
     public IActionResult Listar() =>
-        _context.UsersLogin.Any() != null ? Ok(_context.UsersLogin.ToList()) : BadRequest();
-
-
-    //Cadastrar usuário
-    [HttpPost]
-    [Route("{UserModelId}")]
-    public IActionResult Cadastrar([FromRoute] int UserModelId, [FromBody] LoginRequest LoginRequest)
-    {
-      var login = _Mapper.Map<LoginModel>(LoginRequest);
-      login.UserModelId = UserModelId;
-      _context.UsersLogin.Add(login);
-      _context.SaveChanges();
-      return Created("", login);
-    }
+        _context.UsersLogin.Any() != null ? Ok(_context.UsersLogin.Include(l => l.User).ToList()) : BadRequest();
 
     //Consultar por Id o usuário
     [HttpGet]
-    [Route("{UserModelId}")]
-    public IActionResult BuscarID([FromRoute] int UserModelId){
-    var busca = _context.UsersLogin.FirstOrDefault(U => U.UserModelId == UserModelId);
-    return busca != null ? Ok(busca):NotFound();
-    
+    [Route("{Email}/{Password}")]
+    public IActionResult BuscarID([FromRoute] string Email, [FromRoute] string Password)
+    {
+      var busca = _context.UsersLogin.FirstOrDefault(l => l.Email == Email && l.Password == Password);
+      return busca != null ? Ok(busca) : NotFound();
     }
 
-
-
-
-}
+    [HttpPost]
+    [Route("{UserModelId}")]
+    public IActionResult Atualizar([FromRoute] int UserModelId, [FromBody] LoginRequest Login)
+    {
+      var busca = _context.UsersLogin.FirstOrDefault(l => l.UserModelId == UserModelId);
+      if (busca != null)
+      {
+        var login = _Mapper.Map<LoginModel>(Login);
+        busca.Email = login.Email;
+        busca.Password = login.Password;
+        _context.SaveChanges();
+        return Ok(_context.UsersLogin.Include(l => l.User).FirstOrDefault(l => l.UserModelId == UserModelId));
+      }
+      return NotFound();
+    }
+  }
 }

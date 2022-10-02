@@ -3,6 +3,7 @@ using System;
 using ApiMensageria.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ApiMensageria.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20221001225710_ajuste")]
+    partial class ajuste
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.0");
@@ -64,8 +66,6 @@ namespace ApiMensageria.Migrations
 
                     b.HasKey("MessageModelId");
 
-                    b.HasIndex("UserIssuerId");
-
                     b.HasIndex("UserReceiverId");
 
                     b.ToTable("messagens", (string)null);
@@ -100,7 +100,7 @@ namespace ApiMensageria.Migrations
                     b.HasOne("ApiMensageria.Model.UserModel", "User")
                         .WithOne("Login")
                         .HasForeignKey("ApiMensageria.Model.LoginModel", "UserModelId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -108,19 +108,11 @@ namespace ApiMensageria.Migrations
 
             modelBuilder.Entity("ApiMensageria.Model.MessageModel", b =>
                 {
-                    b.HasOne("ApiMensageria.Model.UserModel", "UserIssuer")
-                        .WithMany()
-                        .HasForeignKey("UserIssuerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("ApiMensageria.Model.UserModel", "UserReceiver")
                         .WithMany("Messages")
                         .HasForeignKey("UserReceiverId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("UserIssuer");
 
                     b.Navigation("UserReceiver");
                 });

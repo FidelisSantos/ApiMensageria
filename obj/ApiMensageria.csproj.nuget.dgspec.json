@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Enzo\\Desktop\\Api_mensageria\\ApiMensageria\\ApiMensageria.csproj": {}
+    "/home/fidelis/Projects/C#/ApiMensageria/ApiMensageria.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Enzo\\Desktop\\Api_mensageria\\ApiMensageria\\ApiMensageria.csproj": {
+    "/home/fidelis/Projects/C#/ApiMensageria/ApiMensageria.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Enzo\\Desktop\\Api_mensageria\\ApiMensageria\\ApiMensageria.csproj",
+        "projectUniqueName": "/home/fidelis/Projects/C#/ApiMensageria/ApiMensageria.csproj",
         "projectName": "ApiMensageria",
-        "projectPath": "C:\\Users\\Enzo\\Desktop\\Api_mensageria\\ApiMensageria\\ApiMensageria.csproj",
-        "packagesPath": "C:\\Users\\Enzo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Enzo\\Desktop\\Api_mensageria\\ApiMensageria\\obj\\",
+        "projectPath": "/home/fidelis/Projects/C#/ApiMensageria/ApiMensageria.csproj",
+        "packagesPath": "/home/fidelis/.nuget/packages/",
+        "outputPath": "/home/fidelis/Projects/C#/ApiMensageria/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Enzo\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "/home/fidelis/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net6.0"
@@ -84,7 +84,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.401\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/6.0.400/RuntimeIdentifierGraph.json"
         }
       }
     }

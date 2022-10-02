@@ -2,11 +2,12 @@ using ApiMensageria.Model;
 using Microsoft.AspNetCore.Mvc;
 using ApiMensageria.Data;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApiMensageria.Controllers
 {
   [ApiController]
-  [Route("api/user")]
+  [Route("user")]
   public class UserController : ControllerBase
   {
 
@@ -22,50 +23,52 @@ namespace ApiMensageria.Controllers
 
 
     //Consultar BD para listar se tem algum usuário
+    ///Assim que subir excluir
     [HttpGet]
     public IActionResult Listar() =>
-        _context.Users.Any() != null ? Ok(_context.Users.ToList()) : BadRequest();
+        _context.Users.Any() ? Ok(_context.Users.Include(u => u.Messages).ToList()) : BadRequest();
 
-
-    //Cadastrar usuário
-    [HttpPost]
-    public IActionResult Cadastrar([FromBody] UserRequest UserRequest)
+    //Consultar por Id o usuário
+    [HttpGet]
+    [Route("{UserModelId}")]
+    public IActionResult BuscarID([FromRoute] int UserModelId)
     {
-      var User = _Mapper.Map<UserModel>(UserRequest);
+      var busca = _context.Users.FirstOrDefault(U => U.UserModelId == UserModelId);
+      return busca != null ? Ok(_context.Users.Include(u => u.Messages).FirstOrDefault(u => u.UserModelId == UserModelId)) : NotFound();
+
+    }
+    [HttpPost]
+    public IActionResult Cadastrar([FromBody] UserCreatedRequest UserCreatedRequest)
+    {
+      var User = _Mapper.Map<UserModel>(UserCreatedRequest);
       User.Created = DateTime.Now;
       _context.Users.Add(User);
       _context.SaveChanges();
       return Created("", User);
     }
 
-    //Consultar por Id o usuário
-    [HttpGet]
-    [Route("{UserModelId}")]
-    public IActionResult BuscarID([FromRoute] int UserModelId){
-    var busca = _context.Users.FirstOrDefault(U => U.UserModelId == UserModelId);
-    return busca != null ? Ok(busca):NotFound();
-    
-    }
-
-
-
-
     //Deletar usuário
     [HttpDelete]
     [Route("{UserModelId}")]
     public IActionResult DeletarId([FromRoute] int UserModelId)
     {
-      _context.Users.Remove(_context.Users.FirstOrDefault(U => U.UserModelId == UserModelId));
-      _context.SaveChanges();
-      return Ok("Deletado");
+      var UserDelete = _context.Users.FirstOrDefault(U => U.UserModelId == UserModelId);
+      if (UserDelete != null)
+      {
+        _context.UsersLogin.Remove(_context.UsersLogin.FirstOrDefault(l => l.UserModelId == UserDelete.UserModelId));
+        _context.Users.Remove(UserDelete);
+        _context.SaveChanges();
+        return Ok("Deletado");
+      }
+      return NotFound();
     }
+
 
     //Atualizar informações do usuário
     [HttpPut]
     [Route("{UserModelId}")]
     public IActionResult AtualizaDados([FromRoute] int UserModelId, [FromBody] UserRequest userRequest)
     {
-
       var User = _Mapper.Map<UserModel>(userRequest);
       var atualizar = _context.Users.FirstOrDefault(U => U.UserModelId == UserModelId);
       if (atualizar != null)
@@ -78,6 +81,5 @@ namespace ApiMensageria.Controllers
       return NotFound();
     }
   }
-
 
 }
