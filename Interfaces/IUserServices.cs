@@ -5,9 +5,9 @@ namespace ApiMensageria.Interfaces
   public interface IUserServices
   {
     List<UserModel> FindAll();
-    UserModel Find(string Email);
+    UserModel Find(int UserModelId);
     UserModel Create(UserModel newUser);
-    UserModel Update(string Email, UserModel updateUser);
-    bool Delete(string Email);
+    UserModel Update(int UserModelId, UserModel updateUser);
+    bool Delete(int UserModelId);
   }
 }
