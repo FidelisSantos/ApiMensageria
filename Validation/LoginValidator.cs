@@ -16,7 +16,7 @@ namespace ApiMensageria.validator
       .Must(Email =>
       {
         return new EmailAddressAttribute().IsValid(Email);
-      });
+      }).WithMessage("Email Inválido");
 
       RuleFor(login => login.Password)
        .NotEmpty().WithMessage("A senha não pode ser vazia")
