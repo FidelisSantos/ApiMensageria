@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ApiMensageria.Data;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using ApiMensageria.Interfaces;
 
 namespace ApiMensageria.Controllers
 {
@@ -12,75 +13,46 @@ namespace ApiMensageria.Controllers
   {
     private readonly IMapper _Mapper;
     private readonly DataContext _context;
+    private readonly IMessageServices services;
 
-    public MessageController(DataContext context, IMapper mapper)
+    public MessageController(DataContext context, IMapper mapper, IMessageServices services)
     {
       _context = context;
       _Mapper = mapper;
-
+      this.services = services;
     }
 
     [HttpPost]
     [Route("{UserIssuerId}/{UserReceiverId}")]
     public IActionResult Enviar([FromRoute] int UserIssuerId, [FromRoute] int UserReceiverId, [FromBody] MessageRequest messageRequest)
     {
-      if (UserIssuerId != UserReceiverId)
-      {
-        var emissor = _context.Users.Find(UserIssuerId);
-        var receptor = _context.Users.Find(UserReceiverId);
-        if (emissor != null && receptor != null)
-        {
-          var message = _Mapper.Map<MessageModel>(messageRequest);
-          message.Sent = DateTime.Now;
-          message.UserIssuerId = UserIssuerId;
-          message.UserIssuer = emissor;
-          message.UserReceiverId = UserReceiverId;
-          message.UserReceiver = receptor;
-          _context.UsersMessage.Add(message);
-          _context.SaveChanges();
-          return Created("", "Enviada");
-        }
-        return BadRequest();
-      }
-      return Conflict();
+      var message = _Mapper.Map<MessageModel>(messageRequest);
+      return services.Create(UserIssuerId, UserReceiverId, message) ? Ok("Enviada") : BadRequest();
     }
 
     [HttpPut]
     [Route("{MessageModelId}")]
     public IActionResult Editar([FromRoute] int MessageModelId, [FromBody] MessageRequest messageRequest)
     {
-      var message = _context.UsersMessage.Find(MessageModelId);
-      if (message != null)
-      {
-        message.Message = messageRequest.Message;
-        _context.SaveChanges();
-        return Ok("Atualizada");
-      }
-      return NotFound("Mensagem não encontrada");
+      var message = _Mapper.Map<MessageModel>(messageRequest);
+      return services.Update(MessageModelId, message) ? Ok(message) : BadRequest();
     }
 
     [HttpDelete]
     [Route("{MessageModelId}")]
     public IActionResult Apagar([FromRoute] int MessageModelId)
     {
-      var message = _context.UsersMessage.Find(MessageModelId);
-      if (message != null)
-      {
-        _context.UsersMessage.Remove(message);
-        _context.SaveChanges();
-        return Ok("Deletado");
-      }
-      return NotFound("Mensagem não encontrada");
+      return services.Delete(MessageModelId) ? Ok("deletado") : BadRequest();
     }
 
     [HttpGet]
     [Route("{UserIssuerId}")]
-    public IActionResult Buscar([FromRoute] int UserIssuerId) => _context.UsersMessage.Any(m => m.UserIssuerId == UserIssuerId) ?
-    Ok(_context.UsersMessage.Include(m => m.UserReceiver).Include(m => m.UserIssuer).FirstOrDefault(u => u.UserIssuerId == UserIssuerId)) : NotFound("Sem mensagens");
+    public IActionResult Buscar([FromRoute] int UserIssuerId) => services.Find(UserIssuerId) != null ? Ok(services.Find(UserIssuerId)) : NotFound();
 
     [HttpGet]
 
-    public IActionResult ListarMensagens() => _context.UsersMessage.Any() ? Ok(_context.UsersMessage.Include(m => m.UserReceiver).Include(m => m.UserIssuer).ToList()) : NotFound("Sem mensagens");
+    public IActionResult ListarMensagens() => services.Findall() != null ? Ok(services.Findall()) : NotFound("Nenhuma mensagem encontrada");
+
   }
 
 }

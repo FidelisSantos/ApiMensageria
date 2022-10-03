@@ -2514,19 +2514,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\pablo\\.nuget\\packages\\": {}
+    "/home/fidelis/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\AulaQuinta\\ApiMensageria\\ApiMensageria.csproj",
+      "projectUniqueName": "/home/fidelis/Projects/C#/ApiMensageria/ApiMensageria.csproj",
       "projectName": "ApiMensageria",
-      "projectPath": "D:\\AulaQuinta\\ApiMensageria\\ApiMensageria.csproj",
-      "packagesPath": "C:\\Users\\pablo\\.nuget\\packages\\",
-      "outputPath": "D:\\AulaQuinta\\ApiMensageria\\obj\\",
+      "projectPath": "/home/fidelis/Projects/C#/ApiMensageria/ApiMensageria.csproj",
+      "packagesPath": "/home/fidelis/.nuget/packages/",
+      "outputPath": "/home/fidelis/Projects/C#/ApiMensageria/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\pablo\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "/home/fidelis/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net6.0"
@@ -2600,7 +2600,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.400\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/6.0.400/RuntimeIdentifierGraph.json"
       }
     }
   }

@@ -1,5 +1,7 @@
 using ApiMensageria.Data;
+using ApiMensageria.Interfaces;
 using ApiMensageria.Mapping;
+using ApiMensageria.Services;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,6 +27,10 @@ builder.Services.AddDbContext<DataContext>(
 );
 
 builder.Services.AddAutoMapper(typeof(UserMapping));
+builder.Services.AddScoped<ILoginServices, LoginServices>();
+builder.Services.AddScoped<IUserServices, UserServices>();
+builder.Services.AddScoped<IMessageServices, MessageServices>();
+
 
 var app = builder.Build();
 

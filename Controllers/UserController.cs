@@ -1,9 +1,7 @@
 using ApiMensageria.Model;
 using Microsoft.AspNetCore.Mvc;
-using ApiMensageria.Data;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using ApiMensageria.Services;
+using ApiMensageria.Interfaces;
 
 namespace ApiMensageria.Controllers
 {
@@ -13,21 +11,23 @@ namespace ApiMensageria.Controllers
   {
 
     private readonly IMapper _Mapper;
-    private readonly UserServices _services;
+    private readonly IUserServices services;
 
-    public UserController(IMapper mapper, UserServices services)
+    public UserController(IMapper mapper, IUserServices services)
     {
       _Mapper = mapper;
-      _services = services;
+      this.services = services;
     }
 
 
     //Consultar BD para listar se tem algum usuário
     ///Assim que subir excluir
     [HttpGet]
-    public IActionResult Listar() {
-      var listar = _services.FindAll;
-      return listar != null ? Ok(listar) : BadRequest();
+    public IActionResult Listar()
+    {
+      var listar = services.FindAll();
+      var UserView = _Mapper.Map<List<UserView>>(listar);
+      return listar != null ? Ok(UserView) : BadRequest();
 
     }
 
@@ -36,7 +36,7 @@ namespace ApiMensageria.Controllers
     [Route("{UserModelId}")]
     public IActionResult BuscarID([FromRoute] int UserModelId)
     {
-      var busca = _services.Find(UserModelId);
+      var busca = services.Find(UserModelId);
       return busca != null ? Ok(busca) : NotFound();
 
     }
@@ -44,9 +44,9 @@ namespace ApiMensageria.Controllers
     public IActionResult Cadastrar([FromBody] UserCreatedRequest UserCreatedRequest)
     {
       var User = _Mapper.Map<UserModel>(UserCreatedRequest);
-      _services.Create(User);
-
-      return Created("", User);
+      services.Create(User);
+      var UserView = _Mapper.Map<UserView>(User);
+      return UserView != null ? Created("", UserView) : BadRequest();
     }
 
     //Deletar usuário
@@ -54,7 +54,7 @@ namespace ApiMensageria.Controllers
     [Route("{UserModelId}")]
     public IActionResult DeletarId([FromRoute] int UserModelId)
     {
-      return _services.Delete(UserModelId) ? Ok("Deletado") : NotFound("Usuário não encontrado");
+      return services.Delete(UserModelId) ? Ok("Deletado") : NotFound("Usuário não encontrado");
     }
 
 
@@ -64,8 +64,9 @@ namespace ApiMensageria.Controllers
     public IActionResult AtualizaDados([FromRoute] int UserModelId, [FromBody] UserRequest userRequest)
     {
       var User = _Mapper.Map<UserModel>(userRequest);
-      var atualizar = _services.Update(UserModelId, User);
-      return atualizar != null ? Ok(atualizar) : NotFound("Usuário não encontrado");
+      var atualizar = services.Update(UserModelId, User);
+      var UserView = _Mapper.Map<UserView>(atualizar);
+      return atualizar != null ? Ok(UserView) : NotFound("Usuário não encontrado");
     }
   }
 

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ApiMensageria.Data;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using ApiMensageria.Services;
+using ApiMensageria.Interfaces;
 
 namespace ApiMensageria.Controllers
 {
@@ -14,11 +14,11 @@ namespace ApiMensageria.Controllers
 
     private readonly IMapper _Mapper;
     private readonly DataContext _context;
-    private readonly LoginServices _services;
+    private readonly ILoginServices services;
 
-    public LoginController(LoginServices services, DataContext context, IMapper mapper)
+    public LoginController(ILoginServices services, DataContext context, IMapper mapper)
     {
-      _services = services;
+      this.services = services;
       _context = context;
       _Mapper = mapper;
 
@@ -35,15 +35,15 @@ namespace ApiMensageria.Controllers
     [Route("{Email}/{Password}")]
     public IActionResult BuscarID([FromRoute] string Email, [FromRoute] string Password)
     {
-      return _services.Find(Email, Password) != null ? Ok(_services.Find(Email, Password)) : NotFound("Usuário não encontrado");
+      return services.Find(Email, Password) != null ? Ok(services.Find(Email, Password)) : NotFound("Usuário não encontrado");
     }
 
     [HttpPost]
     [Route("{UserModelId}")]
     public IActionResult Atualizar([FromRoute] int UserModelId, [FromBody] LoginRequest Login)
     {
-      var mapper = _Mapper.Map <LoginModel> (Login);
-      var atualizar = _services.Update(UserModelId, mapper);
+      var mapper = _Mapper.Map<LoginModel>(Login);
+      var atualizar = services.Update(UserModelId, mapper);
       return atualizar != null ? Ok(atualizar) : NotFound("Usuário não encontrado");
     }
   }

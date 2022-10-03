@@ -19,6 +19,9 @@ namespace ApiMensageria.Mapping
 
       CreateMap<MessageModel, MessageRequest>()
       .ReverseMap();
+
+      CreateMap<UserView, UserModel>()
+      .ReverseMap();
     }
   }
 }
