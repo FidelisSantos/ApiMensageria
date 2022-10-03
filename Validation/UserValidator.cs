@@ -29,7 +29,7 @@ namespace ApiMensageria.validator
               {
                 return new EmailAddressAttribute().IsValid(Email);
               })
-              .WithMessage("Já possui esse email na base");
+              .WithMessage("Email Inválido");
 
       RuleFor(user => user.Login.Password)
       .NotEmpty().WithMessage("A senha não pode ser vazia")
