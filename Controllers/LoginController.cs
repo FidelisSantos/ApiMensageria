@@ -38,7 +38,7 @@ namespace ApiMensageria.Controllers
       return services.Find(Email, Password) != null ? Ok(services.Find(Email, Password)) : NotFound("Usuário não encontrado");
     }
 
-    [HttpPost]
+    [HttpPut]
     [Route("{UserModelId}")]
     public IActionResult Atualizar([FromRoute] int UserModelId, [FromBody] LoginRequest Login)
     {
