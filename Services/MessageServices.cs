@@ -1,3 +1,4 @@
+using System.Net;
 using ApiMensageria.Data;
 using ApiMensageria.Interfaces;
 using ApiMensageria.Model;
@@ -7,60 +8,66 @@ namespace ApiMensageria.Services
 {
   public class MessageServices : IMessageServices
   {
-    private readonly DataContext _context;
-    public MessageServices(DataContext context)
+    private readonly IMessageRepository messageRepository;
+    private readonly IUserRepository userRepository;
+    public MessageServices(IMessageRepository messageRepository, IUserRepository userRepository)
     {
-      _context = context;
+      this.messageRepository = messageRepository;
+      this.userRepository = userRepository;
     }
 
-    public bool Create(int UserIssuerId, int UserReceiverId, MessageModel newMessage)
+    public async Task<MessageModel> Create(int UserIssuerId, int UserReceiverId, MessageModel newMessage)
     {
-      if (UserIssuerId != UserReceiverId)
-      {
-        var emissor = _context.Users.Find(UserIssuerId);
-        var receptor = _context.Users.Find(UserReceiverId);
-        if (emissor != null && receptor != null && newMessage.Message != "")
-        {
-          newMessage.Sent = DateTime.Now;
-          newMessage.UserIssuerId = UserIssuerId;
-          newMessage.UserIssuer = emissor;
-          newMessage.UserReceiverId = UserReceiverId;
-          newMessage.UserReceiver = receptor;
-          _context.UsersMessage.Add(newMessage);
-          _context.SaveChanges();
-          return true;
-        }
-        return false;
-      }
-      return false;
+
+      if (UserIssuerId == UserReceiverId) throw new HttpRequestException("Não pode encaminhar mensagem para o próprio usuário", null, HttpStatusCode.BadRequest);
+      var emissor = await userRepository.Find(UserIssuerId);
+      var receptor = await userRepository.Find(UserReceiverId);
+      if (emissor == null && receptor == null) throw new HttpRequestException("Usuário emissor e usuário receptor nao existem", null, HttpStatusCode.BadRequest);
+      if (emissor == null) throw new HttpRequestException("Usuário emissor não existe", null, HttpStatusCode.BadRequest);
+      if (receptor == null) throw new HttpRequestException("Usuário receptor não existe", null, HttpStatusCode.BadRequest);
+
+      return await messageRepository.Create(emissor, receptor, newMessage);
     }
 
-    public bool Delete(int MessageModelId)
+    public async Task<bool> Delete(int MessageModelId)
     {
-      var message = _context.UsersMessage.Find(MessageModelId);
-      if (message != null)
-      {
-        _context.UsersMessage.Remove(message);
-        _context.SaveChanges();
-        return !_context.UsersMessage.Any(u => u.MessageModelId == MessageModelId);
-      }
-      return false;
+      var message = await messageRepository.Find(MessageModelId);
+      if (message == null) throw new HttpRequestException("Mensagem não encontrada", null, HttpStatusCode.NotFound);
+
+      return await messageRepository.Delete(message);
     }
 
-    public MessageModel Find(int UserIssuerId) => _context.UsersMessage.Include(m => m.UserReceiver).Include(m => m.UserIssuer).FirstOrDefault(u => u.UserIssuerId == UserIssuerId);
-
-    public List<MessageModel> Findall() => _context.UsersMessage.Include(m => m.UserReceiver).Include(m => m.UserIssuer).ToList();
-
-    public bool Update(int MessageModelId, MessageModel updateMessage)
+    public async Task<List<MessageModel>> Find(int UserReceiverId)
     {
-      var message = _context.UsersMessage.Find(MessageModelId);
-      if (message != null && updateMessage.Message != "")
+      try
       {
-        message.Message = updateMessage.Message;
-        _context.SaveChanges();
-        return true;
+        return await messageRepository.FindMessageReceived(UserReceiverId);
       }
-      return false;
+      catch
+      {
+        throw new HttpRequestException("Erro a pesquisar as mensagens", null, HttpStatusCode.InternalServerError);
+      }
+    }
+    public async Task<List<MessageModel>> Findall()
+    {
+      try
+      {
+        return await messageRepository.Findall();
+      }
+      catch
+      {
+        throw new HttpRequestException("Erro a pesquisar as mensagens", null, HttpStatusCode.InternalServerError);
+      }
+    }
+
+    public async Task<MessageModel> Update(int MessageModelId, MessageModel updateMessage)
+    {
+      var message = await messageRepository.Find(MessageModelId);
+      if (message == null) throw new HttpRequestException("Mensagem não encontrada para atualizar", null, HttpStatusCode.NotFound);
+      if (updateMessage.Message == "") throw new HttpRequestException("Mensagem não pode ser vazia", null, HttpStatusCode.BadRequest);
+
+      return await messageRepository.Update(message, updateMessage);
+
     }
   }
 }

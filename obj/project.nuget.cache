@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "jtTHNN+i8KYpv5olzdHb7228s655WF780bHij/gr3l+wb+w663iBVSCgvBqdLAGqs7bK4wWMRWX2MHeA810tIg==",
+  "dgSpecHash": "jeXZODk8KaF8MNNKOJ4IXsVwCxz5Yy5UrNe9MV6+X7Vj3D8czfW16a/nZ595yRijTFxed3DSvu7cp2yMNgOCyQ==",
   "success": true,
   "projectFilePath": "/home/fidelis/Projects/C#/ApiMensageria/ApiMensageria.csproj",
   "expectedPackageFiles": [
@@ -35,8 +35,10 @@
     "/home/fidelis/.nuget/packages/microsoft.netcore.platforms/1.1.0/microsoft.netcore.platforms.1.1.0.nupkg.sha512",
     "/home/fidelis/.nuget/packages/microsoft.netcore.targets/1.1.0/microsoft.netcore.targets.1.1.0.nupkg.sha512",
     "/home/fidelis/.nuget/packages/microsoft.openapi/1.2.3/microsoft.openapi.1.2.3.nupkg.sha512",
+    "/home/fidelis/.nuget/packages/mysqlconnector/2.0.0/mysqlconnector.2.0.0.nupkg.sha512",
     "/home/fidelis/.nuget/packages/newtonsoft.json/13.0.1/newtonsoft.json.13.0.1.nupkg.sha512",
     "/home/fidelis/.nuget/packages/newtonsoft.json.bson/1.0.2/newtonsoft.json.bson.1.0.2.nupkg.sha512",
+    "/home/fidelis/.nuget/packages/pomelo.entityframeworkcore.mysql/6.0.0/pomelo.entityframeworkcore.mysql.6.0.0.nupkg.sha512",
     "/home/fidelis/.nuget/packages/sqlitepclraw.bundle_e_sqlite3/2.0.6/sqlitepclraw.bundle_e_sqlite3.2.0.6.nupkg.sha512",
     "/home/fidelis/.nuget/packages/sqlitepclraw.core/2.0.6/sqlitepclraw.core.2.0.6.nupkg.sha512",
     "/home/fidelis/.nuget/packages/sqlitepclraw.lib.e_sqlite3/2.0.6/sqlitepclraw.lib.e_sqlite3.2.0.6.nupkg.sha512",

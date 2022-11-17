@@ -19,12 +19,11 @@ namespace ApiMensageria.Mapping
       builder.Property(l => l.Password)
             .IsRequired();
 
-      builder.Property(l => l.UserModelId)
-            .IsRequired();
+      builder.HasOne(u => u.User)
+            .WithOne(l => l.Login)
+            .HasForeignKey<LoginModel>(l => l.UserModelId);
 
-      builder.HasOne(l => l.User)
-            .WithOne(u => u.Login)
-            .HasForeignKey<LoginModel>(l => l.UserModelId)
+      builder.Property(l => l.UserModelId)
             .IsRequired();
     }
   }

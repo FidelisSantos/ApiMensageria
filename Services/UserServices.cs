@@ -1,93 +1,85 @@
-using ApiMensageria.Data;
+using System.Net;
 using ApiMensageria.Interfaces;
 using ApiMensageria.Model;
 using ApiMensageria.validator;
-using Microsoft.EntityFrameworkCore;
 
 namespace ApiMensageria.Services
 {
   public class UserServices : IUserServices
   {
-    private readonly DataContext _context;
-
+    private readonly IUserRepository userRepository;
+    private readonly ILoginRepository loginRepository;
     private UserValidator validator = new UserValidator();
     private UserUpdateValidator validatorUpdate = new UserUpdateValidator();
 
-    public UserServices(DataContext context)
+    public UserServices(IUserRepository userRepository, ILoginRepository loginRepository)
     {
-      _context = context;
+      this.userRepository = userRepository;
+      this.loginRepository = loginRepository;
     }
 
-    public UserModel Create(UserModel newUser)
+    public async Task<UserModel> Create(UserModel newUser, LoginModel newLogin)
     {
-      if (_context.Users.Any(u => u.Login.Email == newUser.Login.Email))
-      {
-        return null;
-      }
+      if (await loginRepository.Exists(newUser.Login.Email)) throw new HttpRequestException("Email já existe", null, HttpStatusCode.BadRequest);
       Validate(newUser);
-      newUser.Created = DateTime.Now;
-      _context.Users.Add(newUser);
-      _context.SaveChanges();
-      return newUser;
+      var user = await userRepository.Create(newUser);
+      newLogin.UserModelId = user.UserModelId;
+      newLogin.User = user;
+      var login = await loginRepository.Created(newLogin);
 
+      return user;
     }
 
-    public bool Delete(int UserModelId)
+    public async Task Delete(int UserModelId)
     {
-      var UserDelete = _context.Users.FirstOrDefault(U => U.UserModelId == UserModelId);
-      if (UserDelete != null)
-      {
-        _context.UsersLogin.Remove(_context.UsersLogin.FirstOrDefault(l => l.UserModelId == UserDelete.UserModelId));
-        _context.Users.Remove(UserDelete);
-        _context.SaveChanges();
-        return !_context.Users.Any(U => U.UserModelId == UserDelete.UserModelId);
-      }
-      return false;
+      var userDelete = await userRepository.Find(UserModelId);
+      if (userDelete == null) throw new HttpRequestException("Usuário não existe", null, HttpStatusCode.NotFound);
+      var loginDelete = await loginRepository.FindUserLogin(UserModelId);
+      if (loginDelete != null) await loginRepository.Delete(loginDelete);
+      await userRepository.Delete(userDelete);
     }
 
-    public UserModel Find(int UserModelId)
+    public async Task<UserModel> Find(int UserModelId)
     {
-      return _context.Users.Include(U => U.Messages).FirstOrDefault(U => U.UserModelId == UserModelId);
+
+      var user = await userRepository.Find(UserModelId);
+      if (user == null) throw new HttpRequestException("Usuário não encontrado", null, HttpStatusCode.NotFound);
+
+      return user;
     }
 
-    public List<UserModel> FindAll()
+    public async Task<List<UserModel>> FindAll()
     {
-      return _context.Users.Include(u => u.Messages).ToList();
+      return await userRepository.FindAll(); ;
     }
 
-    public UserModel Update(int UserModelId, UserModel updateUser)
+    public async Task<UserModel> Update(int UserModelId, UserModel updateUser)
     {
-      var atualizar = _context.Users.FirstOrDefault(U => U.UserModelId == UserModelId);
-      if (atualizar != null)
-      {
-        ValidateUpdate(updateUser);
-        atualizar.Name = updateUser.Name;
-        atualizar.Genre = updateUser.Genre;
-        _context.SaveChanges();
-        return (updateUser);
-      }
-      return null;
+      var atualizar = await userRepository.Find(UserModelId);
+      if (atualizar == null) throw new HttpRequestException("Usuário não encontrado", null, HttpStatusCode.NotFound);
+      ValidateUpdate(updateUser);
+      return await userRepository.Update(atualizar, updateUser);
     }
     private void Validate(UserModel model)
     {
       var validationResult = validator.Validate(model);
-      if (!validationResult.IsValid)
-      {
-        var erros = validationResult.Errors.Select(x => x.ErrorMessage);
-        string erroFormatter = string.Join(" ", erros);
-        throw new Exception(erroFormatter);
-      }
+      if (validationResult.IsValid) return;
+
+      var erros = validationResult.Errors.Select(x => x.ErrorMessage);
+      string erroFormatter = string.Join(" ", erros);
+      throw new HttpRequestException(erroFormatter, null, HttpStatusCode.BadRequest);
+
     }
 
     private void ValidateUpdate(UserModel model)
     {
       var validationResult = validatorUpdate.Validate(model);
-      if (!validationResult.IsValid)
-      {
-        var erros = validationResult.Errors.Select(x => x.ErrorMessage);
-        string erroFormatter = string.Join(" ", erros);
-        throw new Exception(erroFormatter);
-      }
+      if (validationResult.IsValid) return;
+
+      var erros = validationResult.Errors.Select(x => x.ErrorMessage);
+      string erroFormatter = string.Join(" ", erros);
+      throw new HttpRequestException(erroFormatter, null, HttpStatusCode.BadRequest);
+
     }
   }
 }

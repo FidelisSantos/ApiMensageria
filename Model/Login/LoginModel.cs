@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
+
 namespace ApiMensageria.Model
 {
   public class LoginModel

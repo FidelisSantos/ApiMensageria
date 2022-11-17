@@ -11,31 +11,33 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ApiMensageria.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220929161502_Initial")]
-    partial class Initial
+    [Migration("20221115073808_Mysql")]
+    partial class Mysql
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "6.0.0");
+            modelBuilder
+                .HasAnnotation("ProductVersion", "6.0.0")
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("ApiMensageria.Model.LoginModel", b =>
                 {
                     b.Property<int>("LoginModelId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(30)");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("UserModelId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.HasKey("LoginModelId");
 
@@ -49,22 +51,24 @@ namespace ApiMensageria.Migrations
                 {
                     b.Property<int>("MessageModelId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<string>("Message")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("longtext");
 
                     b.Property<DateTime>("Sent")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int>("UserIssuerId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<int>("UserReceiverId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.HasKey("MessageModelId");
+
+                    b.HasIndex("UserIssuerId");
 
                     b.HasIndex("UserReceiverId");
 
@@ -75,18 +79,23 @@ namespace ApiMensageria.Migrations
                 {
                     b.Property<int>("UserModelId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("Created")
-                        .HasColumnType("TEXT");
+                        .HasMaxLength(100)
+                        .HasColumnType("datetime(6)");
 
-                    b.Property<char>("Genre")
+                    b.Property<string>("Genre")
+                        .IsRequired()
                         .HasMaxLength(1)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("varchar(1)");
+
+                    b.Property<int>("LoginModelId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("longtext");
 
                     b.HasKey("UserModelId");
 
@@ -106,11 +115,19 @@ namespace ApiMensageria.Migrations
 
             modelBuilder.Entity("ApiMensageria.Model.MessageModel", b =>
                 {
+                    b.HasOne("ApiMensageria.Model.UserModel", "UserIssuer")
+                        .WithMany()
+                        .HasForeignKey("UserIssuerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("ApiMensageria.Model.UserModel", "UserReceiver")
                         .WithMany("Messages")
                         .HasForeignKey("UserReceiverId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("UserIssuer");
 
                     b.Navigation("UserReceiver");
                 });

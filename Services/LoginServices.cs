@@ -1,53 +1,74 @@
+using System.Net;
 using ApiMensageria.Data;
 using ApiMensageria.Interfaces;
 using ApiMensageria.Model;
 using ApiMensageria.validator;
-using Microsoft.EntityFrameworkCore;
 
 namespace ApiMensageria.Services
 {
   public class LoginServices : ILoginServices
   {
-    private readonly DataContext _context;
+    private readonly ILoginRepository loginRepository;
     private LoginValidator validator = new LoginValidator();
 
-    public LoginServices(DataContext context)
+    public LoginServices(DataContext context, ILoginRepository loginRepository)
     {
-      _context = context;
+      this.loginRepository = loginRepository;
     }
 
-    public LoginModel Find(string Email, string Password)
+    public async Task<LoginModel> Find(string Email, string Password)
     {
-      return _context.UsersLogin.FirstOrDefault(l => l.Email == Email && l.Password == Password);
-    }
-
-    public LoginModel Update(int UserModelId, LoginModel updateUser)
-    {
-      var busca = _context.UsersLogin.FirstOrDefault(l => l.UserModelId == UserModelId);
-      if (busca != null)
+      try
       {
-        if (busca.Email == updateUser.Email || !_context.UsersLogin.Any(l => l.Email == updateUser.Email))
-        {
-          Validate(updateUser);
-          busca.Email = updateUser.Email;
-          busca.Password = updateUser.Password;
-          _context.SaveChanges();
-          return _context.UsersLogin.Include(l => l.User).FirstOrDefault(l => l.UserModelId == UserModelId);
-        }
-        return null;
+        var login = await loginRepository.Find(Email, Password);
+        if (login == null) throw new HttpRequestException("Login ou Senha errados", null, HttpStatusCode.InternalServerError);
+        return login;
       }
-      return null;
+      catch
+      {
+        throw new HttpRequestException("Erro ao logar", null, HttpStatusCode.InternalServerError);
+      }
+
+    }
+
+    public async Task<LoginModel> Update(int UserModelId, LoginModel updateUser)
+    {
+      try
+      {
+        var busca = await loginRepository.FindUserLogin(UserModelId);
+        if (busca == null || busca.Email != updateUser.Email || await loginRepository.Exists(updateUser.Email)) return null;
+        Validate(updateUser);
+        return await loginRepository.Update(busca, updateUser);
+      }
+      catch
+      {
+        throw new HttpRequestException("Erro ao Atualizar", null, HttpStatusCode.InternalServerError);
+      }
+
+
+    }
+
+    public async Task<List<LoginModel>> FindAll()
+    {
+      try
+      {
+        return await loginRepository.FindAll();
+      }
+      catch
+      {
+        throw new HttpRequestException("Erro ao Listar", null, HttpStatusCode.InternalServerError);
+      }
     }
 
     private void Validate(LoginModel model)
     {
       var validationResult = validator.Validate(model);
-      if (!validationResult.IsValid)
-      {
-        var erros = validationResult.Errors.Select(x => x.ErrorMessage);
-        string erroFormatter = string.Join(" ", erros);
-        throw new Exception(erroFormatter);
-      }
+      if (validationResult.IsValid) return;
+
+      var erros = validationResult.Errors.Select(x => x.ErrorMessage);
+      string erroFormatter = string.Join(" ", erros);
+      throw new HttpRequestException(erroFormatter, null, HttpStatusCode.BadRequest);
+
     }
   }
 }

@@ -23,50 +23,48 @@ namespace ApiMensageria.Controllers
     //Consultar BD para listar se tem algum usuário
     ///Assim que subir excluir
     [HttpGet]
-    public IActionResult Listar()
+    public async Task<IActionResult> Listar()
     {
-      var listar = services.FindAll();
-      var UserView = _Mapper.Map<List<UserView>>(listar);
-      return listar != null ? Ok(UserView) : BadRequest();
-
+      var listar = await services.FindAll();
+      return Ok(_Mapper.Map<List<UserView>>(listar));
     }
 
     //Consultar por Id o usuário
     [HttpGet]
     [Route("{UserModelId}")]
-    public IActionResult BuscarID([FromRoute] int UserModelId)
+    public async Task<IActionResult> BuscarID([FromRoute] int UserModelId)
     {
-      var busca = services.Find(UserModelId);
-      return busca != null ? Ok(busca) : NotFound();
-
+      var busca = await services.Find(UserModelId);
+      return Ok(_Mapper.Map<UserView>(busca));
     }
     [HttpPost]
-    public IActionResult Cadastrar([FromBody] UserCreatedRequest UserCreatedRequest)
+    public async Task<IActionResult> Cadastrar([FromBody] UserCreatedRequest userCreatedRequest)
     {
-      var User = _Mapper.Map<UserModel>(UserCreatedRequest);
-      services.Create(User);
-      var UserView = _Mapper.Map<UserView>(User);
-      return UserView != null ? Created("", UserView) : BadRequest();
+      var User = _Mapper.Map<UserModel>(userCreatedRequest);
+      var Login = _Mapper.Map<LoginModel>(userCreatedRequest.Login);
+      Console.WriteLine(User);
+      var createdUser = await services.Create(User, Login);
+      return Created("", _Mapper.Map<UserView>(createdUser));
     }
 
     //Deletar usuário
     [HttpDelete]
     [Route("{UserModelId}")]
-    public IActionResult DeletarId([FromRoute] int UserModelId)
+    public async Task DeletarId([FromRoute] int UserModelId)
     {
-      return services.Delete(UserModelId) ? Ok("Deletado") : NotFound("Usuário não encontrado");
+      await services.Delete(UserModelId);
+      Ok("Deletado");
     }
 
 
     //Atualizar informações do usuário
     [HttpPut]
     [Route("{UserModelId}")]
-    public IActionResult AtualizaDados([FromRoute] int UserModelId, [FromBody] UserRequest userRequest)
+    public async Task<IActionResult> AtualizaDados([FromRoute] int UserModelId, [FromBody] UserRequest userRequest)
     {
       var User = _Mapper.Map<UserModel>(userRequest);
-      var atualizar = services.Update(UserModelId, User);
-      var UserView = _Mapper.Map<UserView>(atualizar);
-      return atualizar != null ? Ok(UserView) : NotFound("Usuário não encontrado");
+      var atualizar = await services.Update(UserModelId, User);
+      return Ok(_Mapper.Map<UserView>(atualizar));
     }
   }
 

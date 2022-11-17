@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ApiMensageria.Model
 {
@@ -12,7 +13,7 @@ namespace ApiMensageria.Model
     [Required]
     public DateTime Created { get; set; }
     public LoginModel Login { get; set; }
+    public int LoginModelId { get; set; }
     public ICollection<MessageModel> Messages { get; set; }
-
   }
 }

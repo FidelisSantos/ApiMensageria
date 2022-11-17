@@ -4,7 +4,7 @@
 
 namespace ApiMensageria.Migrations
 {
-    public partial class Ajustando1 : Migration
+    public partial class planetscale : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

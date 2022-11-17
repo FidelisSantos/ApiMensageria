@@ -1,5 +1,6 @@
 using ApiMensageria.Data;
 using ApiMensageria.Interfaces;
+using ApiMensageria.Repository;
 using ApiMensageria.Mapping;
 using ApiMensageria.Services;
 using AutoMapper;
@@ -15,27 +16,31 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var connectionStringMysql = builder.Configuration.GetConnectionString("ConnectionMysql");
 
+//A extensão AddDbContext por padrão é injetada com um Singleton criando uma instância só para a aplicação inteira.
 builder.Services.AddDbContext<DataContext>(
     dbContextOptions => dbContextOptions
-                .UseSqlite("DataSource=Mensageria.db;Cache=shared")
-                // The following three options help with debugging, but should
-                // be changed or removed for production.
+                .UseMySql(
+                  connectionStringMysql,
+                  ServerVersion.Parse("mysqld 8.0.30")
+                )
                 .LogTo(Console.WriteLine, LogLevel.Information)
-                .EnableSensitiveDataLogging()
-                .EnableDetailedErrors()
 );
 
 builder.Services.AddAutoMapper(typeof(UserMapping));
 builder.Services.AddScoped<ILoginServices, LoginServices>();
 builder.Services.AddScoped<IUserServices, UserServices>();
 builder.Services.AddScoped<IMessageServices, MessageServices>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ILoginRepository, LoginRepository>();
+builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+//if (app.Environment.IsDevelopment())
 {
   app.UseSwagger();
   app.UseSwaggerUI();
