@@ -18,46 +18,29 @@ namespace ApiMensageria.Services
 
     public async Task<LoginModel> Find(string Email, string Password)
     {
-      try
-      {
-        var login = await loginRepository.Find(Email, Password);
-        if (login == null) throw new HttpRequestException("Login ou Senha errados", null, HttpStatusCode.InternalServerError);
-        return login;
-      }
-      catch
-      {
-        throw new HttpRequestException("Erro ao logar", null, HttpStatusCode.InternalServerError);
-      }
 
+      var login = await loginRepository.Find(Email, Password);
+      if (login == null) throw new HttpRequestException("Login ou Senha errados", null, HttpStatusCode.InternalServerError);
+      return login;
     }
 
-    public async Task<LoginModel> Update(int UserModelId, LoginModel updateUser)
+    public async Task<LoginModel> Update(int UserModelId, LoginModel updateLogin)
     {
-      try
-      {
-        var busca = await loginRepository.FindUserLogin(UserModelId);
-        if (busca == null || busca.Email != updateUser.Email || await loginRepository.Exists(updateUser.Email)) return null;
-        Validate(updateUser);
-        return await loginRepository.Update(busca, updateUser);
-      }
-      catch
-      {
-        throw new HttpRequestException("Erro ao Atualizar", null, HttpStatusCode.InternalServerError);
-      }
 
+      var busca = await loginRepository.FindUserLogin(UserModelId);
+      Console.Write("entrei aqui");
+      if (busca == null || busca.Email != updateLogin.Email || await loginRepository.Exists(updateLogin.Email)) return null;
+      Console.Write("entrei");
+      Validate(updateLogin);
+      var result = await loginRepository.Update(busca, updateLogin);
+      Console.Write(result);
+      return result;
 
     }
 
     public async Task<List<LoginModel>> FindAll()
     {
-      try
-      {
-        return await loginRepository.FindAll();
-      }
-      catch
-      {
-        throw new HttpRequestException("Erro ao Listar", null, HttpStatusCode.InternalServerError);
-      }
+      return await loginRepository.FindAll();
     }
 
     private void Validate(LoginModel model)

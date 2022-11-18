@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ApiMensageria.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221115073808_Mysql")]
-    partial class Mysql
+    [Migration("20221118135852_Planet")]
+    partial class Planet
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

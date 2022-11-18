@@ -17,13 +17,15 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var connectionStringMysql = builder.Configuration.GetConnectionString("ConnectionMysql");
+var connectionStringPlanetScale = builder.Configuration.GetConnectionString("ConnectionPlanetScale");
+var connectionSqLite = builder.Configuration.GetConnectionString("ConnectionSqLite");
 
 //A extensão AddDbContext por padrão é injetada com um Singleton criando uma instância só para a aplicação inteira.
 builder.Services.AddDbContext<DataContext>(
     dbContextOptions => dbContextOptions
                 .UseMySql(
-                  connectionStringMysql,
-                  ServerVersion.Parse("mysqld 8.0.30")
+                  connectionStringPlanetScale,
+                  ServerVersion.Parse("mysqld 5.7.39")
                 )
                 .LogTo(Console.WriteLine, LogLevel.Information)
 );
