@@ -20,7 +20,7 @@ namespace ApiMensageria.Services
     {
 
       var login = await loginRepository.Find(Email, Password);
-      if (login == null) throw new HttpRequestException("Login ou Senha errados", null, HttpStatusCode.InternalServerError);
+      if (login == null) throw new HttpRequestException("Login ou Senha errados", null, HttpStatusCode.Unauthorized);
       return login;
     }
 
@@ -28,9 +28,7 @@ namespace ApiMensageria.Services
     {
 
       var busca = await loginRepository.FindUserLogin(UserModelId);
-      Console.Write("entrei aqui");
-      if (busca == null || busca.Email != updateLogin.Email || await loginRepository.Exists(updateLogin.Email)) return null;
-      Console.Write("entrei");
+      if (busca == null || busca.Email == updateLogin.Email || await loginRepository.Exists(updateLogin.Email)) throw new HttpRequestException("Dados inválidos para atualização", null, HttpStatusCode.BadRequest);
       Validate(updateLogin);
       var result = await loginRepository.Update(busca, updateLogin);
       Console.Write(result);

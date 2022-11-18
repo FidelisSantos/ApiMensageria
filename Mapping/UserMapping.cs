@@ -25,6 +25,9 @@ namespace ApiMensageria.Mapping
 
       CreateMap<MessageModel, MessageView>()
       .ReverseMap();
+
+      CreateMap<LoginModel, LoginView>()
+      .ReverseMap();
     }
   }
 }

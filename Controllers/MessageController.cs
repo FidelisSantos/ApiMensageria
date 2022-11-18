@@ -51,7 +51,7 @@ namespace ApiMensageria.Controllers
     public async Task<IActionResult> Buscar([FromRoute] int UserReceiverId)
     {
       var messageModel = await services.Find(UserReceiverId);
-      return Ok(_Mapper.Map<MessageView>(messageModel));
+      return Ok(_Mapper.Map<List<MessageView>>(messageModel));
     }
 
     [HttpGet]

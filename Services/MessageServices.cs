@@ -39,25 +39,11 @@ namespace ApiMensageria.Services
 
     public async Task<List<MessageModel>> Find(int UserReceiverId)
     {
-      try
-      {
-        return await messageRepository.FindMessageReceived(UserReceiverId);
-      }
-      catch
-      {
-        throw new HttpRequestException("Erro a pesquisar as mensagens", null, HttpStatusCode.InternalServerError);
-      }
+      return await messageRepository.FindMessageReceived(UserReceiverId);
     }
     public async Task<List<MessageModel>> Findall()
     {
-      try
-      {
-        return await messageRepository.Findall();
-      }
-      catch
-      {
-        throw new HttpRequestException("Erro a pesquisar as mensagens", null, HttpStatusCode.InternalServerError);
-      }
+      return await messageRepository.Findall();
     }
 
     public async Task<MessageModel> Update(int MessageModelId, MessageModel updateMessage)
