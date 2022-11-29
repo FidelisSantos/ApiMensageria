@@ -16,9 +16,7 @@ builder.Services.AddControllers()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var connectionStringMysql = builder.Configuration.GetConnectionString("ConnectionMysql");
 var connectionStringPlanetScale = builder.Configuration.GetConnectionString("ConnectionPlanetScale");
-var connectionSqLite = builder.Configuration.GetConnectionString("ConnectionSqLite");
 
 //A extensão AddDbContext por padrão é injetada com um Singleton criando uma instância só para a aplicação inteira.
 builder.Services.AddDbContext<DataContext>(
@@ -30,6 +28,7 @@ builder.Services.AddDbContext<DataContext>(
                 .LogTo(Console.WriteLine, LogLevel.Information)
 );
 
+builder.Services.AddCors();
 builder.Services.AddAutoMapper(typeof(UserMapping));
 builder.Services.AddScoped<ILoginServices, LoginServices>();
 builder.Services.AddScoped<IUserServices, UserServices>();
@@ -37,7 +36,6 @@ builder.Services.AddScoped<IMessageServices, MessageServices>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ILoginRepository, LoginRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
-
 
 var app = builder.Build();
 
@@ -47,6 +45,13 @@ var app = builder.Build();
   app.UseSwagger();
   app.UseSwaggerUI();
 }
+
+app.UseCors(c =>
+{
+  c.AllowAnyHeader();
+  c.AllowAnyMethod();
+  c.AllowAnyOrigin();
+});
 
 app.UseHttpsRedirection();
 
